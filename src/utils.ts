@@ -56,7 +56,7 @@ export function getHelpInfo() {
 Usage: ft <command> [options]
 
 Commands:
-  ft interactive  
+  i interactive  
 
 Options[default]: 
   -v, --version  Show version number
@@ -64,5 +64,7 @@ Options[default]:
 
 Examples:
   ft interactive
+  ft i
+  ft
  `)
 }

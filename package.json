@@ -2,7 +2,10 @@
   "name": "@leafvein/ft",
   "version": "0.0.0",
   "description": "It's easier to fetch a template",
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "template"
+  ],
   "homepage": "https://github.com/zealleaf/ft#readme",
   "bugs": {
     "url": "https://github.com/zealleaf/ft/issues"
