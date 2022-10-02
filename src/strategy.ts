@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { fileURLToPath } from 'url'
+// import { fileURLToPath } from 'url'
 import pic from 'picocolors'
 import prt from 'prompts'
 import type { Color } from 'ora'
@@ -7,10 +7,12 @@ import ora from 'ora'
 import { $, path } from 'zx'
 import rimraf from 'rimraf'
 import { io, read } from 'fsxx'
-import { getHelpInfo, getPkg } from './utils'
+import { version } from '../package.json'
+import { getHelpInfo } from './utils'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// const __filename = fileURLToPath(import.meta.url)
+// const __dirname = path.dirname(__filename)
+const __cwd = process.cwd()
 
 export type Command =
   | 'default'
@@ -37,15 +39,13 @@ export const COMMAND_OPTIONS_MAP: CommandOptionsMap = {
 }
 
 export const STRATEGY_MAP: StrategyMap = {
-  default: (options) => {
+  default: async (options) => {
     if (options.includes('--help'))
       getHelpInfo()
 
     if (options.includes('--version')) {
       console.log(
-        pic.inverse(
-          pic.bold(pic.white(`v${getPkg().version}`)),
-        ),
+        pic.inverse(pic.bold(pic.white(`v${version}`))),
       )
     }
   },
@@ -62,18 +62,22 @@ export const STRATEGY_MAP: StrategyMap = {
     try {
       spinner.start('connecting ft pool...')
 
-      rimraf(
-        path.resolve(__dirname, '../ft-pool-temp'),
+      await rimraf(
+        path.resolve(__cwd, './ft-pool-temp'),
         () => {},
       )
 
       await $`npx degit zealleaf/ft-pool ft-pool-temp`.quiet()
 
       const templates: any = await read.json`${path.resolve(
-        __dirname,
-        '../ft-pool-temp/pool.json',
+        __cwd,
+        './ft-pool-temp/pool.json',
       )}`
 
+      await rimraf(
+        path.resolve(__cwd, './ft-pool-temp'),
+        () => {},
+      )
       spinner.succeed('connected!')
 
       const res = await prt([
@@ -100,8 +104,8 @@ export const STRATEGY_MAP: StrategyMap = {
       await $`npx degit ${res.templateName} ${res.projectName}`.quiet()
 
       const { data: pkg, save } = await io`${path.resolve(
-        __dirname,
-        `../${res.projectName}/package.json`,
+        __cwd,
+        `./${res.projectName}/package.json`,
       )}`
 
       await save(

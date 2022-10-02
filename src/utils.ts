@@ -1,11 +1,4 @@
-import { io } from 'fsxx'
 import { ALIAS_MAP, COMMAND_OPTIONS_MAP } from './strategy'
-
-const { data: pkg } = io.json.sync<any>`package.json`
-
-export function getPkg() {
-  return pkg
-}
 
 export function getFullNameByAliasIfExist(s: string) {
   return Object.keys(ALIAS_MAP).includes(s)
