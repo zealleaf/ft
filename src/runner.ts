@@ -1,4 +1,4 @@
-import type { Command } from './strategy'
+import type { Command } from './constants'
 import { handleArgs } from './args'
 
 export type Runner = (

@@ -1,4 +1,5 @@
-import { ALIAS_MAP, COMMAND_OPTIONS_MAP } from './strategy'
+import pic from 'picocolors'
+import { ALIAS_MAP, COMMAND_OPTIONS_MAP } from './constants'
 
 export function getFullNameByAliasIfExist(s: string) {
   return Object.keys(ALIAS_MAP).includes(s)
@@ -50,14 +51,46 @@ Usage: ft <command> [options]
 
 Commands:
   i interactive  
+  d direct
 
-Options[default]: 
+Options: 
+[default]:
   -v, --version  Show version number
   -h, --help     Show help
+[direct]
+  -r, --repository
+  -p, --projectName
 
 Examples:
   ft interactive
   ft i
   ft
+
+  ft direct --repository=username/repoName --projectName=demo
+  ft d -r=username/repoName -p=demo
  `)
+}
+
+export function getErrorInfo(error: any) {
+  console.error(
+    pic.inverse(
+      pic.bold(
+        pic.red(
+          '------------------error message-----------------',
+        ),
+      ),
+    ),
+  )
+
+  console.error(error)
+
+  console.error(
+    pic.inverse(
+      pic.bold(
+        pic.red(
+          '------------------------------------------------',
+        ),
+      ),
+    ),
+  )
 }

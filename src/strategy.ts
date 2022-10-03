@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-// import { fileURLToPath } from 'url'
 import pic from 'picocolors'
 import prt from 'prompts'
 import type { Color } from 'ora'
@@ -8,35 +7,10 @@ import { $, path } from 'zx'
 import rimraf from 'rimraf'
 import { io, read } from 'fsxx'
 import { version } from '../package.json'
-import { getHelpInfo } from './utils'
+import { getErrorInfo, getHelpInfo } from './utils'
+import type { StrategyMap } from './constants'
 
-// const __filename = fileURLToPath(import.meta.url)
-// const __dirname = path.dirname(__filename)
 const __cwd = process.cwd()
-
-export type Command =
-  | 'default'
-  | 'not_found'
-  | 'interactive'
-
-export type CommandOptionsMap = Record<Command, string[]>
-
-export type StrategyMap = Record<
-  Command,
-  (options: string[]) => void
->
-
-export const ALIAS_MAP = {
-  '-h': '--help',
-  'i': 'interactive',
-  '-v': '--version',
-}
-
-export const COMMAND_OPTIONS_MAP: CommandOptionsMap = {
-  default: ['--help', '--version'],
-  not_found: [],
-  interactive: [],
-}
 
 export const STRATEGY_MAP: StrategyMap = {
   default: async (options) => {
@@ -133,28 +107,44 @@ export const STRATEGY_MAP: StrategyMap = {
     }
     catch (error) {
       spinner.fail('download failed')
-
-      console.error(
-        pic.inverse(
-          pic.bold(
-            pic.red(
-              '------------------error message-----------------',
-            ),
-          ),
-        ),
-      )
-
-      console.error(error)
-
-      console.error(
-        pic.inverse(
-          pic.bold(
-            pic.red(
-              '------------------------------------------------',
-            ),
-          ),
-        ),
-      )
+      getErrorInfo(error)
+    }
+  },
+  direct: async (options) => {
+    const optionsStr = options.join('')
+    const spinner = ora()
+    if (
+      optionsStr.includes('--repository')
+      && optionsStr.includes('--projectName')
+    ) {
+      try {
+        const optionObj = {
+          repository: '',
+          projectName: '',
+        }
+        for (const option of options) {
+          const [key, value] = option.split('=')
+          if (
+            optionObj[
+              key.slice(2) as keyof typeof optionObj
+            ] !== undefined
+          ) {
+            optionObj[
+              key.slice(2) as keyof typeof optionObj
+            ] = value
+          }
+        }
+        spinner.start('fetching template...')
+        await $`degit ${optionObj.repository} ${optionObj.projectName}`.quiet()
+        spinner.succeed('successfully 🎉')
+      }
+      catch (error) {
+        spinner.fail('failed')
+        getErrorInfo(error)
+      }
+    }
+    else {
+      getHelpInfo()
     }
   },
 }
